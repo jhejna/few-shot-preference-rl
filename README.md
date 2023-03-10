@@ -48,6 +48,8 @@ There are two special keys. The first `"base"` is required and specifies the pat
 
 ## Reproducing Results
 
+### Pretraining
+
 In order to reproduce the results from the paper, pretraining datsets must be generated. This can be done in parallel using the scripts in the `scripts` folder via the following commands:
 
 MetaWorld:
@@ -75,6 +77,15 @@ python tools/run_slurm.py --partition <partition> --cpus 8 --mem 28G --job-name 
 python tools/run_slurm.py --partition <partition> --cpus 1 --mem 4G --job-name panda-dataset --seeds-per-job 16 --entry-point scripts/panda/collect_block_dataset.py --arguments random-ep=8 expert-ep=50 cross-ep=5 policy-noise=0.15 policies=../output/human_rl/05_30/panda/block_push_sweep/ init-noise=0.3 path=output/block_sac
 ```
 
-Then, train the MAML models using the provided configs after modifying them to include the dataset path.
+Then, train the MAML models using the provided configs after modifying them to include the dataset path. For example, to pre-train for metaworld, modify `dataset_kwargs.paths` in the config file `configs/metaworld/maml.yaml` to the constructed datasets. Then, train the model using:
+```
+python scripts/train.py --config configs/metaworld/maml.yaml --path path/to/save/dir
+```
 
-Finally, our models can be trained by editting the sweep files to include the trained MAML checkpoint.
+### Running Experiments
+Our config files are currently formatted into `.json` grid sweep files that reproduce all the results contained in the paper. PEBBLE is equivalent to just running `alg: PEBBLE` without setting a checkpoint. The init baseline is equivalent to running PEBBLE with `checkpoint` set. Our method is running `FewShotPEBBLE` with `checkpoint` set to the `best_model.pt` output from MAML. You can run all of these at once by modifying the `.json` file to have the path to the checkpoint and then using the sweeper:
+```
+python tools/run_slurm.py --partition <partition> --cpus 2 --mem 8G --job-name metaworld --arguments config=configs/metaworld/button_press_sweep.json path=path/to/output/dir
+```
+
+If you just want to run our method, you can edit the `pebble.yaml` config file by setting the algorithm to `FewShotPEBBLE` and the checkpoint path to the output of MAML. The feedback schedules are specified in the sweep files, and those can also be carried over into the individual configs.
