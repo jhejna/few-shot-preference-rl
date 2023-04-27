@@ -8,7 +8,7 @@ This repository is based on [research-lightning](https://github.com/jhejna/resea
 
 ## Installation
 
-First cloen the repository. Then complete the following steps:
+First clone the repository. Then complete the following steps:
 1. Edit `environment_cpu.yaml` and `environment_gpu.yaml` as desired to include any additional dependencies via conda or pip. You can also change the name if desired. This is needed if you are going to use PolyMetis for real robot experiments. You can view their documentation [here](https://facebookresearch.github.io/fairo/polymetis/installation.html).
 2. Create the conda environment using `conda env create -f environment_<cpu or gpu>.yaml`.
 3. Install the research package via `pip install -e research`.
